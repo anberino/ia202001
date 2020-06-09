@@ -98,15 +98,40 @@ class BlackjackMDP(util.MDP):
         if action == 'Sair':
             return []
 
-        #pegar cartas que ainda estao no deck
-        cards = []
-        i = 0
-        for card in deck:
-            if card > 0:
-                cards.append(i)
-            i = i+1
-
+        states = [] #lista de estados
         
+        #colocar os estados possiveis caso ele queira pegar
+        if action == "Pegar":
+            #pega aleatoriamente
+            if peek == None:
+                i = 0
+                for card in deck:
+                    if card > 0:
+                        new_deck = deck
+                        new_deck[i] = new_deck[i]-1
+                        states.append((hand+i, peek, new_deck))
+                    i = i+1
+            else:
+                #pega a carta que ele espiou
+                new_deck = deck
+                new_deck[peek] = new_deck[peek]-1
+                states.append(((hand+peek, None, new_deck), 1, 0))
+
+            return states
+
+        if action == "Espiar":
+            if peek == None:
+                #só pode fazer o peek se não tiver peekado antes
+                i = 0
+                for card in deck:
+                    if card > 0:
+                        states.append((hand, i, deck))
+                    i = i+1
+            else:
+                return []
+            return states
+
+        return states
 
         # END_YOUR_CODE
 
