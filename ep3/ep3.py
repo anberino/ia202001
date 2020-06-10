@@ -87,18 +87,31 @@ class BlackjackMDP(util.MDP):
            don't include that state in the list returned by succAndProbReward.
         """
         # BEGIN_YOUR_CODE
-        hand = state[0]
-        peek = state[1]
-        deck = state[2]
 
-        #Condições de parada do jogo
+        hand = state[0] #state[0][0]
+        peek = state[1] #state[0][1]
+        deck = state[2] #state[0][2]
+
+        #Condição de parada do jogo
         if deck == None:
             return []
         
         if action == 'Sair':
-            return []
+            return [((hand, None, None), 1, 0)]
 
         states = [] #lista de estados
+
+        #ver o numero de cartas que faltam no deck e "quais sao"
+        decksize = 0
+        possible = 0
+
+        for card in deck:
+            if card > 0:
+                possible = possible+1
+            decksize = decksize+card
+
+        if decksize == 0:
+            return [((hand, None, None), 1, 0)]
         
         #colocar os estados possiveis caso ele queira pegar
         if action == "Pegar":
@@ -109,7 +122,10 @@ class BlackjackMDP(util.MDP):
                     if card > 0:
                         new_deck = deck
                         new_deck[i] = new_deck[i]-1
-                        states.append((hand+i, peek, new_deck))
+                        if hand+i > self.limiar:
+                            new_deck = None
+                        if card/decksize > 0: #esse if parece inutil mas...
+                            states.append(((hand+i, peek, new_deck), card/decksize, 0))
                     i = i+1
             else:
                 #pega a carta que ele espiou
@@ -125,7 +141,7 @@ class BlackjackMDP(util.MDP):
                 i = 0
                 for card in deck:
                     if card > 0:
-                        states.append((hand, i, deck))
+                        states.append((hand, i, deck), 1/possible, -self.custo_espiada)
                     i = i+1
             else:
                 return []
