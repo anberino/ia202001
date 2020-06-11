@@ -124,14 +124,13 @@ class BlackjackMDP(util.MDP):
                         new_deck[i] = new_deck[i]-1
                         if hand+i > self.limiar:
                             new_deck = None
-                        if card/decksize > 0: #esse if parece inutil mas...
-                            states.append(((hand+i, peek, new_deck), card/decksize, 0))
+                        states.append(((hand+i+1, peek, new_deck), card/decksize, 0))
                     i = i+1
             else:
                 #pega a carta que ele espiou
                 new_deck = deck
                 new_deck[peek] = new_deck[peek]-1
-                states.append(((hand+peek, None, new_deck), 1, 0))
+                states.append(((hand+peek+1, None, new_deck), 1, 0))
 
             return states
 
