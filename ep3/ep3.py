@@ -190,7 +190,23 @@ class ValueIteration(util.MDPAlgorithm):
         V = defaultdict(float)  # state -> value of state
         # Implement the main loop of Asynchronous Value Iteration Here:
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+
+        solved = False
+
+        while not solved:
+            #value iteration yay    
+            Vline = defaultdict(-math.inf)
+            for s in mdp.states:
+                for a in mdp.actions():
+                    Q = computeQ(mdp, V, s, a)
+                    if Q > Vline[s]:
+                        Vline[s] = Q
+            solved = True
+            for v, vl in V, Vline:
+                if abs(v-vl) < epsilon:
+                    solved = False
+            V[:] = Vline[:]
+        
         # END_YOUR_CODE
 
         # Extract the optimal policy now
