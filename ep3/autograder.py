@@ -62,7 +62,7 @@ def run_tests():
         file_flag = "w"
     file_results = open("final_result.txt", file_flag)
     final_grades = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]  # Grade list (code, p01_01, p01_02, p02, p03)
-    lint_result = pylint.lint.Run(['ep3.py'], do_exit=False)
+    lint_result = pylint.lint.Run(['ep3.py'], exit=False)
     for k in lint_result.linter.stats["by_module"]:
         mod_name = k
     msg_types = lint_result.linter.stats["by_module"][mod_name]

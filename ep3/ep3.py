@@ -120,16 +120,18 @@ class BlackjackMDP(util.MDP):
                 i = 0
                 for card in deck:
                     if card > 0:
-                        new_deck = deck
+                        new_deck = list(deck)
                         new_deck[i] = new_deck[i]-1
+                        new_deck = tuple(new_deck)
                         if hand+i > self.limiar:
                             new_deck = None
                         states.append(((hand+i+1, peek, new_deck), card/decksize, 0))
                     i = i+1
             else:
                 #pega a carta que ele espiou
-                new_deck = deck
+                new_deck = list(deck)
                 new_deck[peek] = new_deck[peek]-1
+                new_deck = tuple(new_deck)
                 states.append(((hand+peek+1, None, new_deck), 1, 0))
 
             return states
@@ -140,7 +142,7 @@ class BlackjackMDP(util.MDP):
                 i = 0
                 for card in deck:
                     if card > 0:
-                        states.append((hand, i, deck), 1/possible, -self.custo_espiada)
+                        states.append(((hand, i, deck), 1/possible, -self.custo_espiada))
                     i = i+1
             else:
                 return []
@@ -195,9 +197,9 @@ class ValueIteration(util.MDPAlgorithm):
 
         while not solved:
             #value iteration yay    
-            Vline = defaultdict(-math.inf)
+            Vline = defaultdict(lambda: -math.inf)
             for s in mdp.states:
-                for a in mdp.actions():
+                for a in mdp.actions(s):
                     Q = computeQ(mdp, V, s, a)
                     if Q > Vline[s]:
                         Vline[s] = Q

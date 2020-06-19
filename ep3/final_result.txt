@@ -1,0 +1,50 @@
+******************************
+Code quality:
+------------------------------
+Code grade: 6.34/10.0	(Code with reasonably quality)
+------------------------------
+Standards deviation:
+statement:	0
+info:	0
+convention:	39
+refactor:	3
+warning:	3
+error:	0
+fatal:	0
+------------------------------
+Deviation description:
+trailing-whitespace:	4
+line-too-long:	2
+singleton-comparison:	3
+too-many-return-statements:	1
+too-many-branches:	1
+invalid-name:	28
+arguments-differ:	1
+missing-docstring:	2
+too-few-public-methods:	1
+unused-argument:	2
+******************************
+Tests:
+------------------------------
+Parte01-01 Modeling MDPs:
+Modeling MDPs:	0/2 correct
+Test concluded without errors
+Grade in the Test01: 0.0/10.0
+------------------------------
+Part02-01 ValueIteration::
+Python error: too many values to unpack (expected 2)
+Test did not conclude
+Receiving grade 0.0 in the test
+Grade in the Test02-01: 0.0/10.0
+------------------------------
+Part02-02 Peeking MDP:
+Python error: Not implemented yet
+Test did not conclude
+Receiving grade 0.0 in the test
+Grade in the Test02-02: 0.0/10.0
+------------------------------
+Part03-01 QLearningAlgorithm:
+Python error: Not implemented yet
+Test did not conclude
+Receiving grade 0.0 in the test
+Grade in the Test03-01: 0.0/10.0
