@@ -228,7 +228,7 @@ class ValueIteration(util.MDPAlgorithm):
                         Vline[s] = Q
             solved = True
             for v, vl in zip(V, Vline):
-                if abs(V[v]-Vline[vl]) < epsilon:
+                if abs(V[v]-Vline[vl]) > epsilon:
                     solved = False
             V = {**Vline}
         
@@ -252,7 +252,7 @@ def geraMDPxereta():
     optimal action for at least 10% of the states.
     """
     # BEGIN_YOUR_CODE
-    MDPx = BlackjackMDP(valores_cartas=[1, 5], multiplicidade=2, limiar=15, custo_espiada=1)
+    MDPx = BlackjackMDP(valores_cartas=[5, 10], multiplicidade=4, limiar=15, custo_espiada=1)
 
     return MDPx
     # END_YOUR_CODE
