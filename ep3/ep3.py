@@ -92,15 +92,19 @@ class BlackjackMDP(util.MDP):
         peek = state[1] #state[0][1]
         deck = state[2] #state[0][2]
 
-        #Condição de parada do jogo
+        # print("minha mão é ") #TEST
+        # print(hand) #TEST
+        # print("meu peek é") #TEST
+        # print(peek) #TEST
+        # print("meu deck é") #TEST
+        # print(deck) #TEST
+
+        #primeiro, ver a condicao de parada
         if deck == None:
+            #print("ENTREI NO DECK NONE") #TEST
             return []
-        
-        if action == 'Sair':
-            return [((hand, None, None), 1, 0)]
 
-        states = [] #lista de estados
-
+        #se ele nao parou, vamos ver como esta o deck
         #ver o numero de cartas que faltam no deck e "quais sao"
         decksize = 0
         possible = 0
@@ -110,29 +114,48 @@ class BlackjackMDP(util.MDP):
                 possible = possible+1
             decksize = decksize+card
 
-        if decksize == 0:
-            return [((hand, None, None), 1, 0)]
+        # print("meu deck tem %d cartas de %d tipos" % (decksize, possible)) #TEST
+
+        #se nao tem mais cartas no deck, hora de sair e receber meu reward
+        if action == 'Sair':
+            # print("ENTREI NO ACTION SAIR") #TEST
+            return [((hand, None, None), 1, hand)]
+
+        #nada pra parar aconteceu, hora de ver estados pra retornar
+        states = []
         
         #colocar os estados possiveis caso ele queira pegar
         if action == "Pegar":
-            #pega aleatoriamente
+            # print("HORA DE PEGAR CARTINHAS") #TEST
+            prize = 0 #premio por pegar cartas
             if peek == None:
-                i = 0
+                # print("NAO TEM PEEK") #TEST
+                #pega aleatoriamente
+                i = 0 #contador do indice
                 for card in deck:
+                    #so tem chance de pegar cartas que nao sao 0 (prob > 0)
                     if card > 0:
+                        # edita o deck para tirar a carta
+                        value = self.valores_cartas[i] #valor da carta nesse indice
+                        # print(deck) #TEST
+                        # print("estou pegando  do deck a carta de indice %d, cujo naipe é %d com card = %d" % (i, value, card)) #TEST
                         new_deck = list(deck)
                         new_deck[i] = new_deck[i]-1
                         new_deck = tuple(new_deck)
-                        if hand+i > self.limiar:
+                        if hand+value > self.limiar: #extinguir o deck caso o limiar estoure
                             new_deck = None
-                        states.append(((hand+i+1, peek, new_deck), card/decksize, 0))
+                        if decksize-1 == 0: #fugir caso pegue a ultima carta
+                            new_deck = None
+                            prize = hand+value
+                        states.append(((hand+value, peek, new_deck), card/decksize, prize))
                     i = i+1
+                    # print("oi eu sou o i = %d" % i) #TEST
             else:
-                #pega a carta que ele espiou
+                #pega a carta que espiou
                 new_deck = list(deck)
                 new_deck[peek] = new_deck[peek]-1
                 new_deck = tuple(new_deck)
-                states.append(((hand+peek+1, None, new_deck), 1, 0))
+                states.append(((hand+self.valores_cartas[peek], None, new_deck), 1, prize))
 
             return states
 
@@ -204,10 +227,10 @@ class ValueIteration(util.MDPAlgorithm):
                     if Q > Vline[s]:
                         Vline[s] = Q
             solved = True
-            for v, vl in V, Vline:
-                if abs(v-vl) < epsilon:
+            for v, vl in zip(V, Vline):
+                if abs(V[v]-Vline[vl]) < epsilon:
                     solved = False
-            V[:] = Vline[:]
+            V = {**Vline}
         
         # END_YOUR_CODE
 
@@ -229,7 +252,9 @@ def geraMDPxereta():
     optimal action for at least 10% of the states.
     """
     # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
+    MDPx = BlackjackMDP(valores_cartas=[1, 5], multiplicidade=2, limiar=15, custo_espiada=1)
+
+    return MDPx
     # END_YOUR_CODE
 
 
