@@ -88,20 +88,12 @@ class BlackjackMDP(util.MDP):
         """
         # BEGIN_YOUR_CODE
 
-        hand = state[0] #state[0][0]
-        peek = state[1] #state[0][1]
-        deck = state[2] #state[0][2]
-
-        # print("minha mão é ") #TEST
-        # print(hand) #TEST
-        # print("meu peek é") #TEST
-        # print(peek) #TEST
-        # print("meu deck é") #TEST
-        # print(deck) #TEST
+        hand = state[0]
+        peek = state[1]
+        deck = state[2]
 
         #primeiro, ver a condicao de parada
         if deck == None:
-            #print("ENTREI NO DECK NONE") #TEST
             return []
 
         #se ele nao parou, vamos ver como esta o deck
@@ -114,11 +106,8 @@ class BlackjackMDP(util.MDP):
                 possible = possible+1
             decksize = decksize+card
 
-        # print("meu deck tem %d cartas de %d tipos" % (decksize, possible)) #TEST
-
         #se nao tem mais cartas no deck, hora de sair e receber meu reward
         if action == 'Sair':
-            # print("ENTREI NO ACTION SAIR") #TEST
             return [((hand, None, None), 1, hand)]
 
         #nada pra parar aconteceu, hora de ver estados pra retornar
@@ -126,10 +115,8 @@ class BlackjackMDP(util.MDP):
         
         #colocar os estados possiveis caso ele queira pegar
         if action == "Pegar":
-            # print("HORA DE PEGAR CARTINHAS") #TEST
             prize = 0 #premio por pegar cartas
             if peek == None:
-                # print("NAO TEM PEEK") #TEST
                 #pega aleatoriamente
                 i = 0 #contador do indice
                 for card in deck:
@@ -137,8 +124,6 @@ class BlackjackMDP(util.MDP):
                     if card > 0:
                         # edita o deck para tirar a carta
                         value = self.valores_cartas[i] #valor da carta nesse indice
-                        # print(deck) #TEST
-                        # print("estou pegando  do deck a carta de indice %d, cujo naipe é %d com card = %d" % (i, value, card)) #TEST
                         new_deck = list(deck)
                         new_deck[i] = new_deck[i]-1
                         new_deck = tuple(new_deck)
@@ -149,7 +134,6 @@ class BlackjackMDP(util.MDP):
                             prize = hand+value
                         states.append(((hand+value, peek, new_deck), card/decksize, prize))
                     i = i+1
-                    # print("oi eu sou o i = %d" % i) #TEST
             else:
                 #pega a carta que espiou
                 new_deck = list(deck)
@@ -218,19 +202,18 @@ class ValueIteration(util.MDPAlgorithm):
 
         solved = False
 
-        while not solved:
-            #value iteration yay    
-            Vline = defaultdict(lambda: -math.inf)
+        while not solved:   
+            Vline = defaultdict(lambda: -math.inf) #inicializa o novo vetor
             for s in mdp.states:
                 for a in mdp.actions(s):
-                    Q = computeQ(mdp, V, s, a)
+                    Q = computeQ(mdp, V, s, a) #acha o Q pra cada estado e acao
                     if Q > Vline[s]:
                         Vline[s] = Q
-            solved = True
-            for v, vl in zip(V, Vline):
-                if abs(V[v]-Vline[vl]) > epsilon:
+            solved = True #supoe que foi resolvido
+            for v, vl in zip(V, Vline): 
+                if abs(V[v]-Vline[vl]) > epsilon: #confere pra ver se foi resolvido mesmo
                     solved = False
-            V = {**Vline}
+            V = {**Vline} #atualiza o vetor sem causar problemas de dict
         
         # END_YOUR_CODE
 
@@ -314,7 +297,26 @@ class QLearningAlgorithm(util.RLAlgorithm):
          HINT: Remember to check if s is a terminal state and s' None.
         """
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+
+        #conferir se nada esta vazio
+        if state is None or newState is None:
+            return
+
+        #vamos ver a feature de cada estado
+        f = self.featureExtractor(state, action)
+
+        #variaveis para simplificar
+        q = self.getQ(state, action)
+        alpha = self.getStepSize()
+        gamma = self.discount
+        V = self.getAction(newState)
+        w = self.weights
+
+        #computar os novos w de acordo com o feaure
+        for s in f:
+            w[s[0]] = w[s[0]] + alpha*(reward + gamma*V - q)*s[1]
+
+        
         # END_YOUR_CODE
 
 def identityFeatureExtractor(state, action):
@@ -339,5 +341,30 @@ def blackjackFeatureExtractor(state, action):
     (See identityFeatureExtractor() above for a simple example.)
     """
     # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
+
+    #nao entendi como extrair um feature relevante so com as informações que a funcao recebe
+    featureKey = (state, action)
+
+    #pega as informacoes do state
+    hand = state[0]
+    peek = state[1]
+    deck = state[2]
+
+    remaining = 0
+    multi = 0
+    for slot in deck:
+        if slot > multi:
+            multi = slot
+        remaining += slot
+
+    #não devolve 0 como feature
+    if remaining == 0 and multi == 0:
+        featureValue = 1
+    elif remaining > multi:
+        featureValue = multi/remaining
+    else:
+        featureValue = remaining/multi
+
+    return [(featureKey, featureValue)]
+
     # END_YOUR_CODE
